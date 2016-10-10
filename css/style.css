@@ -1,0 +1,93 @@
+
+.box {
+    width: 280px;
+    max-height: 500px;
+    border: 1px solid gray;
+    float: left;
+    margin: 5px;
+    padding: 10px;
+    color: gray;
+    overflow: auto;
+    font-size: 14px;
+}
+h2 {
+    color: gray;
+}
+
+#value_list {
+    border: 1px solid #ccc;
+    font-size: 14px;
+    height: 34px;
+    width: 268px;
+    color: gray;
+}
+
+label, option {
+    color: gray;
+
+}
+
+.header {
+    font-size: 24px;
+    color: gray;
+    font-weight: bold;
+
+}
+
+.list_span {
+    text-align: center;
+    margin-left: 400px;
+}
+
+.box_container {
+    float: left;
+    width: 22%;
+}
+
+/*.map_container {*/
+    /*/!*float: left;*!/*/
+    /*/!*width: 80%;*!/*/
+    /*/!*height: 500px;*!/*/
+    /*width: 500px;*/
+    /*height: 500px;*/
+/*}*/
+
+.select2-results__options {
+    max-height: 500px !important;
+}
+
+#selecr_attr_label {
+    padding-bottom: 5px;
+}
+
+#loading-img {
+    /*background: url('../images/5.gif') center center no-repeat;*/
+    height: 50px;
+    width: 50px;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+    z-index: 20;
+    font-size: 24px;
+}
+
+#loading-text {
+    height: 100%;
+    z-index: 20;
+}
+
+.overlay {
+    background: #e9e9e9;
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.5;
+    z-index: 10000;
+}
+
+body{
+    font: 14px sans-serif;
+}
