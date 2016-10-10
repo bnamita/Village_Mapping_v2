@@ -208,7 +208,8 @@ DistrictMap_Leaflet.prototype = {
                     url: 'geometry/' + geojson_file_map[self.district_name] + '.geojson',
                     success: function (geojsonObj) {
                         self.choroLayer.addTo(self.map);
-                        self.choroLayer.addData(JSON.parse(geojsonObj))
+                        //self.choroLayer.addData(JSON.parse(geojsonObj))
+                        self.choroLayer.addData(geojsonObj);
                         self.bestFitZoom();
 
                         if (self.searchControl === undefined) {
