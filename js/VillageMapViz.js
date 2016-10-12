@@ -67,9 +67,7 @@ VillageMapViz.prototype = {
             $('#box').html(selectHTML);
             $('#box').val('Total.Population.of.Village');
             //$("#box").select2();
-            var attrList = $("#box").select2({
-                closeOnSelect: false
-            })
+            var attrList = $("#box").select2();
             //    .on("select2:closing", function(e) {
             //    e.preventDefault();
             //}).on("select2:closed", function(e) {
