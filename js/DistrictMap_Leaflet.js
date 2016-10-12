@@ -331,6 +331,7 @@ DistrictMap_Leaflet.prototype = {
             },
             error: function() {
                 console.log("Error");
+                alert("Data not available for " +self.district_name + ". Please select another district.");
             }
 
         });
