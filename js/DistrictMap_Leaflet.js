@@ -37,6 +37,38 @@ DistrictMap_Leaflet.prototype = {
         })
         this.choroLayer = new L.geoJson(null);
         this.info = L.control();
+
+        this.legend = L.control({position: 'bottomright'});
+
+        this.legend.onAdd = function (map) {
+
+            var div = L.DomUtil.create('div', 'info legend'),
+                labels = [];
+
+            var grades = [0, 0.2, 0.4, 0.6, 0.8];
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + self.getLegendColor(grades[i]) + '"></i> ' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+
+            return div;
+        };
+
+        this.legend.addTo(this.map);
+    },
+
+    updateLegend: function(max) {
+        var grades = [0, 0.2, 0.4, 0.6, 0.8];
+        var div = $('.legend')[0];
+        div.innerHTML = '';
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + this.getLegendColor(grades[i]) + '"></i> ' +
+                Math.floor(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + Math.floor(grades[i + 1]*max) + '<br>' : '&ndash;' + Math.floor(max));
+        }
     },
 
     getColor: function (data, min, max) {
@@ -63,6 +95,16 @@ DistrictMap_Leaflet.prototype = {
                     perc > 0.2  ? '#fecc5c' :
                         perc > 0    ? '#ffffb2' :
                             perc === -1 ? '#000' :
+                                '#000'
+    },
+
+    getLegendColor: function(perc) {
+        return perc >= 0.8  ? '#bd0026' :
+            perc >= 0.6  ? '#f03b20' :
+                perc >= 0.4  ? '#fd8d3c' :
+                    perc >= 0.2  ? '#fecc5c' :
+                        perc >= 0    ? '#ffffb2' :
+                            //perc === -1 ? '#000' :
                                 '#000'
     },
 
@@ -116,6 +158,9 @@ DistrictMap_Leaflet.prototype = {
 
 
         this.parseCSVFile().done(function(result) {
+            var min = Math.min.apply(Math,result.map(function(o) { return parseFloat(o[self.field_name])})),
+                max = Math.max.apply(Math,result.map(function(o) { return parseFloat(o[self.field_name])}));
+            self.updateLegend(max);
 
              function getResult() {
                  return result;
@@ -216,6 +261,10 @@ DistrictMap_Leaflet.prototype = {
 
                         if (self.searchControl === undefined) {
                             self.searchControl = new L.Control.Search({
+                                //container: 'findbox',
+                                textPlaceholder: 'Search Village...',
+                                collapsed: false,
+                                //position: 'topright',
                                 layer: self.choroLayer,
                                 propertyName: 'VILLNAME',
                                 circleLocation: true,
@@ -245,6 +294,13 @@ DistrictMap_Leaflet.prototype = {
 
 
                         self.loading(false);
+                    },
+                    error: function(e) {
+                        console.log("File not available.")
+                        alert("Data not available for " +self.district_name + ". Please select another district.");
+
+                        self.loading(false);
+
                     }
                 });
 
@@ -287,6 +343,7 @@ DistrictMap_Leaflet.prototype = {
 
             var min = Math.min.apply(Math,self.featureData.map(function(o) { return parseFloat(o[self.field_name])})),
                 max = Math.max.apply(Math,self.featureData.map(function(o) { return parseFloat(o[self.field_name])}));
+            self.updateLegend(max);
 
             var csvLayerData = _.find(self.featureData, function(d) {
                 return d['Village.Code'] == layer.feature.properties.VLGCD2011;
