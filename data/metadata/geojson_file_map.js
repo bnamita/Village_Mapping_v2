@@ -1,3 +1,4 @@
+
 var districts = ['Pune', 'Satara','Kolhapur','Solapur','Sindhudurg','Thane','Latur','Hingoli','Aurangabad','Akola','Washim','Sangli','Dhule','Nandurbar','Jalgaon','Ahmadnagar','Bid','Buldana','Palghar','Raigad','Ratnagiri','Nashik','Jalna','Parbhani','Osmanabad','Nanded','Amravati','Bhandara','Chandrapur','Dhule','Gadchiroli','Gondiya','Mumbai_Sub','Nanded','Nagpur','Wardha','Yavatmal'];
 
 var geojson_file_map = {

@@ -126,7 +126,7 @@ DistrictMap_Leaflet.prototype = {
 
             var dataVal = (csvLayerData && csvLayerData[self.field_name]) ? csvLayerData[self.field_name] : 'NA'
             this._div.innerHTML = '<h4>' + self.field_name + '  </h4>' +  (shapeLayerData ?
-                '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData.VLGCD2011 + ') : </b><br />' + dataVal : '') ;
+                '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData[fieldToMatch['geometry']] + ') : </b><br />' + dataVal : '') ;
             if (csvLayerData && (shapeLayerData.VILLNAME !== csvLayerData['Village.Name'])) {
                 this._div.innerHTML += '<br>' + ' Village name in csv: ' + csvLayerData['Village.Name'];
 
@@ -204,7 +204,7 @@ DistrictMap_Leaflet.prototype = {
                             max = Math.max.apply(Math,self.featureData.map(function(o) { return parseFloat(o[fieldName])}));
 
                         var csvLayerData = _.find(self.featureData, function(d) {
-                            return d['Village.Code'] == feature.properties.VLGCD2011;
+                            return d[fieldToMatch['csv']] == feature.properties[fieldToMatch['geometry']];
                         })
                         //if (csvLayerData === undefined) {
                         //    console.log(feature)
@@ -228,7 +228,7 @@ DistrictMap_Leaflet.prototype = {
                         //});
                         var featureData = getResult();
                         var csvLayerData = _.find(featureData, function(d) {
-                            return d['Village.Code'] == feature.properties.VLGCD2011;
+                            return d[fieldToMatch['csv']] == feature.properties[fieldToMatch['geometry']];
                         })
                         layer.on({
                             mouseover: function(e) {
@@ -341,6 +341,7 @@ DistrictMap_Leaflet.prototype = {
 
     updateStyle: function() {
         var self = this;
+        var $deferred = new $.Deferred();
         this.choroLayer.eachLayer(function(layer) {
 
             var min = Math.min.apply(Math,self.featureData.map(function(o) { return parseFloat(o[self.field_name])})),
@@ -348,7 +349,7 @@ DistrictMap_Leaflet.prototype = {
             self.updateLegend(max);
 
             var csvLayerData = _.find(self.featureData, function(d) {
-                return d['Village.Code'] == layer.feature.properties.VLGCD2011;
+                return d[fieldToMatch['csv']] == layer.feature.properties[fieldToMatch['geometry']];
             })
 
             layer.setStyle({
@@ -360,6 +361,9 @@ DistrictMap_Leaflet.prototype = {
                 fillColor: self.getColor(csvLayerData, min, max )
             });
         });
+        $deferred.resolve();
+        return $deferred.promise();
+
     },
 
 
@@ -382,7 +386,7 @@ DistrictMap_Leaflet.prototype = {
                     if (item === dataAttr) {
                         dataAttrIndex = itemNo;
                     }
-                    if (item === 'Village.Code') {
+                    if (item === fieldToMatch['csv']) {
                         joinByIndex = itemNo;
                     }
                     if (item === 'Village.Name') {
@@ -428,11 +432,17 @@ DistrictMap_Leaflet.prototype = {
     },
 
     setFieldName: function(name) {
+        var self = this;
+        $(".info")[0].textContent = "Loading...";
+        this.loading(true);
         this.field_name = name;
-        this.updateStyle();
-        this.info.update();
+        this.updateStyle().done(function(){
+            self.loading(false);
+            self.info.update();
+        });
 
-        //this.loading(true);
+
+
         //this.create_map();
     },
 
