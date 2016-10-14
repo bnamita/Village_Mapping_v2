@@ -7,14 +7,14 @@ VillageMapViz.prototype = {
         this.district_name = "Ahmadnagar";
         this.field_name = "Total.Population.of.Village";
 
-        if (this.map_type === 'leaflet') {
-            $($('#map_container')[0]).addClass('map_container').removeClass('highchart_map_container');
+        //if (this.map_type === 'leaflet') {
+        //    $($('#map_container')[0]).addClass('map_container').removeClass('highchart_map_container');
             this.districtMap = new DistrictMap_Leaflet();
 
-        } else {
-            $($('#map_container')[0]).removeClass('map_container').addClass('highchart_map_container');
-            this.districtMap = new DistrictMap_HighChart();
-        }
+        //} else {
+        //    $($('#map_container')[0]).removeClass('map_container').addClass('highchart_map_container');
+        //    this.districtMap = new DistrictMap_HighChart();
+        //}
 
 
         this.createMap();
@@ -86,7 +86,6 @@ VillageMapViz.prototype = {
     },
 
     createDistrictList: function() {
-        var districts = ['Pune', 'Satara','Kolhapur','Solapur','Sindhudurg','Thane','Latur','Hingoli','Aurangabad','Akola','Washim','Sangli','Dhule','Nandurbar','Jalgaon','Ahmadnagar','Bid','Buldana','Palghar','Raigad','Ratnagiri','Nashik','Jalna','Parbhani','Osmanabad','Nanded','Amravati','Bhandara','Chandrapur','Dhule','Gadchiroli','Gondiya','Mumbai_Sub','Nanded','Nagpur','Wardha','Yavatmal'];
 
         // District List
         var selectHTML="";
