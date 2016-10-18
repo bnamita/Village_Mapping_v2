@@ -90,4 +90,9 @@ label, option {
 
 body{
     font: 14px sans-serif;
+    padding: 10px;
+}
+
+#district-list {
+    width: 150px;
 }
