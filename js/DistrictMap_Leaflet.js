@@ -9,6 +9,7 @@ DistrictMap_Leaflet.prototype = {
         this.div_id = args.divId;
         this.district_name = args.district_name || 'Pune';
         this.field_name = args.field_name || 'Total.Population.of.Village'
+        this.opacityVal = 0.7;
         if (!this.map) {
             this.setup_map();
         }
@@ -26,18 +27,86 @@ DistrictMap_Leaflet.prototype = {
             "street_classic": "bnamita.lbkf97cf"
         };
         var map_color = map_id["light"];
+
+        /* --   FROM NIKHIL -- */
+        /* set up the map*/
         var osmLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
         var mapboxUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
         var MBAttrib = '&copy; ' + osmLink + ' Contributors & <a href="https://www.mapbox.com/about/maps/">Mapbox</a>';
-        var tileLayer = L.tileLayer(mapboxUrl, {id: map_color, attribution: MBAttrib});
+        MBAttrib += '<br>Link to census data: ' + '<a href="http://www.censusindia.gov.in/2011census/dchb/DCHB.html">Click here</a>';
+
+        var MBstreets = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mlpl2d', attribution: MBAttrib}),
+            MBsatlabel = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mmaa87', attribution: MBAttrib}),
+            MBsat = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mni8e7', attribution: MBAttrib}),
+            MBemerald = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mmebk6', attribution: MBAttrib}),
+            MBrun = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mmicn2', attribution: MBAttrib}),
+            MBlight = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mmobne', attribution: MBAttrib}),
+            MBbw = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mn13df', attribution: MBAttrib}),
+            MBdark = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.jme9hi44', attribution: MBAttrib}),
+            MBpencil = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mn5lf5', attribution: MBAttrib}),
+            MBpirates = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mn8b72', attribution: MBAttrib}),
+            MBwheatpaste = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mnld61', attribution: MBAttrib}),
+            MBcomic = L.tileLayer(mapboxUrl, {id: 'nikhilsheth.m0mo16hg', attribution: MBAttrib}),
+
+            OsmIndia = L.tileLayer(mapboxUrl, {id: 'openstreetmap.1b68f018', attribution: MBAttrib});
+
+        var baseLayers = {
+            "OpenStreetMap.IN": OsmIndia,
+            "Mapbox Streets": MBstreets,
+            "Mapbox Satellite w/labels": MBsatlabel ,
+            "Mapbox Light": MBlight ,
+            "Mapbox Dark": MBdark
+        };
+
+        var overlays = {
+            //"Electoral Wards": wards
+        };
+
+
+        /* -- END FROM NIKHIL -- */
+
+        //var tileLayer = L.tileLayer(mapboxUrl, {id: map_color, attribution: MBAttrib});
+
         this.map = L.map('map_container', {
             center: [18.62, 74.2],
             zoom: 9,
-            layers: [tileLayer]
+            layers: [MBlight]
         })
+
+        //    .on('overlayremove', function(e) {  // to reset the side panel
+        //    document.getElementById('sidepanel-content').innerHTML = '';
+        //});
+        var layerControl = L.control.layers(baseLayers, overlays, {collapsed: true}).addTo(this.map); //changed to selectLayers() so that layers panel doesn't get too big.
+
+        var MH_district_boundaries = L.geoJson(null, {
+            //onEachFeature: function (feature, layer) { defaultOnEachFeature(feature, layer, title, fields); },
+            style: {weight: 2, opacity: 1, color: '#636363', dashArray: '4', fillOpacity: 0 },
+            onEachFeature: function(feature, layer) {
+                //layer.on({
+                //    //click: onMapClick,
+                //    click: function (e) {
+                //        var loc = '<br>Located in Prabhag : ' + feature.properties.wardnum;
+                //        url = getTileURL(e.latlng.lat, e.latlng.lng, map.getZoom()); //integrated the tile solution from http://jsfiddle.net/84P9r/ with this popup.
+                //        popup
+                //            .setLatLng(e.latlng)
+                //            .setContent(e.latlng.toString() + loc)
+                //            .openOn(map);
+                //    },
+                //    mouseover: function (e) {
+                //        $('#wardNum').html('Mouse currently over Prabhag <b>' + feature.properties.wardnum + '</b>');
+                //    },
+                //    mouseout: function (e) {
+                //        $('#wardNum').html('');
+                //    }
+                //}); // end of layer.on
+            } // end of onEachFeature
+        }).addTo(self.map);
+
+        omnivore.geojson('geometry/overlays/MH_district_boundaries.geojson', null, MH_district_boundaries);
+        layerControl.addOverlay(MH_district_boundaries , "District Boundaries");
+
         this.choroLayer = new L.geoJson(null);
         this.info = L.control();
-
         this.legend = L.control({position: 'bottomright'});
 
         this.legend.onAdd = function (map) {
@@ -52,11 +121,13 @@ DistrictMap_Leaflet.prototype = {
                     '<i style="background:' + self.getLegendColor(grades[i]) + '"></i> ' +
                     grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
             }
+            div.innerHTML += '<i style="background:#000"></i> NA <br>';
 
             return div;
         };
 
         this.legend.addTo(this.map);
+
     },
 
     updateLegend: function(max) {
@@ -69,6 +140,7 @@ DistrictMap_Leaflet.prototype = {
                 '<i style="background:' + this.getLegendColor(grades[i]) + '"></i> ' +
                 Math.floor(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + Math.floor(grades[i + 1]*max) + '<br>' : '&ndash;' + Math.floor(max));
         }
+        div.innerHTML += '<br> <i style="background:#000"></i> NA <br>';
     },
 
     getColor: function (data, min, max) {
@@ -126,7 +198,7 @@ DistrictMap_Leaflet.prototype = {
 
             var dataVal = (csvLayerData && csvLayerData[self.field_name]) ? csvLayerData[self.field_name] : 'NA'
             this._div.innerHTML = '<h4>' + self.field_name + '  </h4>' +  (shapeLayerData ?
-                '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData[fieldToMatch['geometry']] + ') : </b><br />' + dataVal : '') ;
+                '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData[fieldToMatch['geometry']] + '), ' + shapeLayerData['IPNAME']  +  ': </b><br />' + dataVal : '') ;
             if (csvLayerData && (shapeLayerData.VILLNAME !== csvLayerData['Village.Name'])) {
                 this._div.innerHTML += '<br>' + ' Village name in csv: ' + csvLayerData['Village.Name'];
 
@@ -135,6 +207,15 @@ DistrictMap_Leaflet.prototype = {
         };
 
         self.info.addTo(self.map);
+
+        if (!this.opacitySlider) {
+            //Create the opacity controls
+            this.opacitySlider = new L.Control.opacitySlider({position: 'topright'});
+            this.map.addControl(this.opacitySlider);
+            $('.opacity_slider_control').on('slide', function(e, ui) {
+                self.setOpacity(ui.value/100);
+            });
+        }
 
 
         function getDensityColor(data) {
@@ -176,7 +257,7 @@ DistrictMap_Leaflet.prototype = {
                         weight: 1,
                         color: '#666',
                         dashArray: '',
-                        fillOpacity: 0.8
+                        fillOpacity: self.opacityVal
                     });
 
                     if (!L.Browser.ie && !L.Browser.opera) {
@@ -211,10 +292,10 @@ DistrictMap_Leaflet.prototype = {
                         //}
                         return {
                             weight: 2,
-                            opacity: 1,
+                            opacity: self.opacityVal,
                             color: 'white',
                             dashArray: '3',
-                            fillOpacity: 0.7,
+                            fillOpacity: self.opacityVal,
                             fillColor: self.getColor(csvLayerData, min, max )
                         };
                     },
@@ -354,10 +435,10 @@ DistrictMap_Leaflet.prototype = {
 
             layer.setStyle({
                 weight: 2,
-                opacity: 1,
+                opacity: self.opacityVal,
                 color: 'white',
                 dashArray: '3',
-                fillOpacity: 0.7,
+                fillOpacity: self.opacityVal,
                 fillColor: self.getColor(csvLayerData, min, max )
             });
         });
@@ -466,8 +547,8 @@ DistrictMap_Leaflet.prototype = {
 
         // map._layers gives all the layers of the map including main container
         // so looping in all those layers filtering those having feature
-        $.each(self.map._layers, function(ml){
-
+        $.each(self.choroLayer._layers, function(ml){
+            //self.opacitySlider.setOpacityLayer(this);
             // here we can be more specific to feature for point, line etc.
             if(this._latlngs)
             {
@@ -490,7 +571,18 @@ DistrictMap_Leaflet.prototype = {
             //$("#loading-img").html('');
         }
 
+    },
+
+    setOpacity: function(val) {
+        this.choroLayer.eachLayer(function(layer) {
+            layer.setStyle({
+                fillOpacity: val,
+                opacity: val
+            })
+        });
+        this.opacityVal = val;
     }
+
 
 
 
