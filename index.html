@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
     <link rel="stylesheet" href="css/leaflet-search.css">
     <link rel="stylesheet" href="css/Control.Opacity.css" />
-    <title>Village Mapping</title>
-
+    <title>MH Village Mapping</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/map.css">
 
@@ -18,9 +17,7 @@
     <script>
         function init() {
             var viz = new VillageMapViz();
-            viz.setup({
-                map_type: 'leaflet'
-            });
+            viz.setup();
         }
     </script>
 
@@ -30,23 +27,20 @@
 
     <div class="overlay">
         <div id="loading-img">
-
             <i class="fa fa-circle-o-notch fa-spin fa-3x" aria-hidden="true"></i>
-            <!--<span> Loading... </span>-->
         </div>
-        <!--<div id=loading-text"> Loading... </div>-->
+
     </div>
 
     <div>
-    <span class="header"> Village Mapping</span>
-    <span id="area_list" class="list_span">
+        <span class="header"> Village Mapping</span>
+        <span id="area_list" class="list_span">
             <label for="district-list"> Select district</label>
                 <select id="district-list">
-                    <!--<input id="value_list" class="typeahead" type="text" placeholder="attributes">-->
                 </select>
         </span>
     </div>
-<br>
+    <br>
     <div>
         <label for="area_list" id="selecr_attr_label">Select Attribute: </label>
 
@@ -60,41 +54,34 @@
         <div id="map_container" class="map_container"></div>
     </div>
 
-</div>
-
-
-
-
-</div>
-</div>
-<script src="js/lib/jquery.min.js"   crossorigin="anonymous"></script>
-<script src='js/lib/d3.min.js' backup='https://s3-us-west-2.amazonaws.com/s.cdpn.io/22878/d3.min.js'></script>
-<!--<script src="js/lib/leaflet.js"></script>-->
-<script src="js/lib/underscore.js"></script>
-<script src="js/lib/select2.min.js"></script>
-<script src="js/lib/papaparse.min.js"></script>
-<script src="js/lib/leaflet-src.js"></script>
-<script src="js/lib/leaflet-search.min.js"></script>
-<script src="js/lib/leaflet-omnivore.min.js"></script>
-<!--<script src="js/lib/highmaps.js"></script>-->
-<!--<script src="https://code.highcharts.com/maps/modules/data.js"></script>-->
-<!--<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>-->
-<!--<script src="data/metadata/csv_file_map.js"></script>-->
-<!--<script src="data/metadata/geojson_file_map.js"></script>-->
-<!--<script src="js/DistrictMap_HighChart.js"></script>-->
-
+    <!-- JQUERY LIBRARIES -->
+    <script src="js/lib/jquery.min.js"   crossorigin="anonymous"></script>
     <script src="js/lib/jquery-ui-1.10.3.custom.min.js"></script>
+
+    <!-- LEAFLET -->
+    <script src="js/lib/leaflet-src.js"></script>
+    <script src="js/lib/leaflet-search.min.js"></script>
+    <script src="js/lib/leaflet-omnivore.min.js"></script>
+
+
+    <!-- D3 -->
+    <script src='js/lib/d3.min.js' backup='https://s3-us-west-2.amazonaws.com/s.cdpn.io/22878/d3.min.js'></script>
+
+    <!-- SELECT2 -->
+    <script src="js/lib/underscore.js"></script>
+    <script src="js/lib/select2.min.js"></script>
+
+    <!-- CSV PARSING -->
+    <script src="js/lib/papaparse.min.js"></script>
+
+
+    <!-- LEAFLET LAYER OPACITY -->
     <script src="js/lib/opacity/Control.Opacity.js"></script>
 
+    <!-- APPLICATION SPECIFIC JS -->
     <script src="data/metadata/config.js"></script>
-<script src="js/DistrictMap_Leaflet.js"></script>
-<script src="js/VillageMapViz.js"></script>
+    <script src="js/DistrictMap_Leaflet.js"></script>
+    <script src="js/VillageMapViz.js"></script>
 
-
-
-
-
-
-
-</body>
+    </body>
 </html>
