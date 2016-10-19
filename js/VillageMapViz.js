@@ -3,26 +3,20 @@ function VillageMapViz() {};
 VillageMapViz.prototype = {
     setup: function(args) {
         // setup variables
-        this.map_type = args.map_type ? args.map_type : 'leaflet'
         this.district_name = "Ahmadnagar";
         this.field_name = "Total.Population.of.Village";
+        this.districtMap = new DistrictMap_Leaflet();
 
-        //if (this.map_type === 'leaflet') {
-        //    $($('#map_container')[0]).addClass('map_container').removeClass('highchart_map_container');
-            this.districtMap = new DistrictMap_Leaflet();
-
-        //} else {
-        //    $($('#map_container')[0]).removeClass('map_container').addClass('highchart_map_container');
-        //    this.districtMap = new DistrictMap_HighChart();
-        //}
-
-
+        // call to create leaflet map
         this.createMap();
 
+        // populate attribute list
         this.createAttrList();
 
+        // populate district list
         this.createDistrictList();
 
+        // attach change events for district and attribute
         this.attachEvents();
 
 
@@ -38,6 +32,8 @@ VillageMapViz.prototype = {
 
     createAttrList: function () {
         var self = this;
+
+        // attribute list comes from census_fields_meta.csv
         d3.csv("./data/metadata/census_fields_meta.csv", function (csv_metadata) {
 
             var colArr = [],
@@ -48,46 +44,21 @@ VillageMapViz.prototype = {
                 }
             }
 
-            //var div = d3.select(".box")
-            //div.selectAll('li')
-            //    .data(colArr)
-            //    .enter()
-            //    .append("li")
-            //    //.append("span")
-            //    .attr("class", "attr")
-            //    .html(function(d, i) {
-            //        return '<span>' + colArr[i] + '</span>';
-            //    })
-            //$(".box").select2();
-
             for( i = 0; i < colArr.length; i++) {
                 selectHTML+= "<option value='"+ colArr[i] + "'>" + colArr[i] + "</option>";
             }
 
             $('#box').html(selectHTML);
             $('#box').val('Total.Population.of.Village');
-            //$("#box").select2();
+
             var attrList = $("#box").select2();
-            //    .on("select2:closing", function(e) {
-            //    e.preventDefault();
-            //}).on("select2:closed", function(e) {
-            //    attrList.select2("open");
-            //})
-
-
-
-
-            //    .on("select2:blur", function(e) {
-            //    $.find('.select2-results__option--highlighted[aria-selected]').removeClass('.select2-results__option--highlighted[aria-selected]');
-            //});
             attrList.select2("open");
 
         });
     },
 
     createDistrictList: function() {
-
-        // District List
+        // District List comes from config.js
         var selectHTML="";
         for( i = 0; i < districts.length; i++) {
             selectHTML+= "<option value='"+ districts[i] + "'>" + districts[i] + "</option>";
@@ -102,27 +73,13 @@ VillageMapViz.prototype = {
         var self = this;
         $('#district-list').on('change', function(val) {
             self.district_name = $("#district-list").val();
-            //if (self.district_name.indexOf('Kolhapur') > -1) {
-            //    self.district_name = '530_Kolhapur';
-            //} else if (self.district_name.indexOf('Pune') > -1) {
-            //    self.district_name = '521_Pune';
-            //}
-            //$("#map_container").html("loading...")
-            //self.setDistrictName(self.district_name);
-            //self.createMap();
             self.districtMap.setDistrictName(self.district_name);
         });
-
 
         $("#box").change(function(val) {
             var val = $('#box').val();
             self.districtMap.setFieldName(val);
         });
-        
-
-
-            //self.districtMap.setFieldName('Outside the State/UT distance');
-
     }
 }
 

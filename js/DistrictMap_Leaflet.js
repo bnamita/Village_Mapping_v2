@@ -58,14 +58,10 @@ DistrictMap_Leaflet.prototype = {
             "Mapbox Dark": MBdark
         };
 
-        var overlays = {
-            //"Electoral Wards": wards
-        };
+        var overlays = {};
 
 
         /* -- END FROM NIKHIL -- */
-
-        //var tileLayer = L.tileLayer(mapboxUrl, {id: map_color, attribution: MBAttrib});
 
         this.map = L.map('map_container', {
             center: [18.62, 74.2],
@@ -73,32 +69,13 @@ DistrictMap_Leaflet.prototype = {
             layers: [MBlight]
         })
 
-        //    .on('overlayremove', function(e) {  // to reset the side panel
-        //    document.getElementById('sidepanel-content').innerHTML = '';
-        //});
         var layerControl = L.control.layers(baseLayers, overlays, {collapsed: true}).addTo(this.map); //changed to selectLayers() so that layers panel doesn't get too big.
 
+        // add the district boundary layer
         var MH_district_boundaries = L.geoJson(null, {
-            //onEachFeature: function (feature, layer) { defaultOnEachFeature(feature, layer, title, fields); },
             style: {weight: 2, opacity: 1, color: '#636363', dashArray: '4', fillOpacity: 0 },
             onEachFeature: function(feature, layer) {
-                //layer.on({
-                //    //click: onMapClick,
-                //    click: function (e) {
-                //        var loc = '<br>Located in Prabhag : ' + feature.properties.wardnum;
-                //        url = getTileURL(e.latlng.lat, e.latlng.lng, map.getZoom()); //integrated the tile solution from http://jsfiddle.net/84P9r/ with this popup.
-                //        popup
-                //            .setLatLng(e.latlng)
-                //            .setContent(e.latlng.toString() + loc)
-                //            .openOn(map);
-                //    },
-                //    mouseover: function (e) {
-                //        $('#wardNum').html('Mouse currently over Prabhag <b>' + feature.properties.wardnum + '</b>');
-                //    },
-                //    mouseout: function (e) {
-                //        $('#wardNum').html('');
-                //    }
-                //}); // end of layer.on
+
             } // end of onEachFeature
         }).addTo(self.map);
 
@@ -109,6 +86,7 @@ DistrictMap_Leaflet.prototype = {
         this.info = L.control();
         this.legend = L.control({position: 'bottomright'});
 
+        // add the legend
         this.legend.onAdd = function (map) {
 
             var div = L.DomUtil.create('div', 'info legend'),
@@ -130,6 +108,7 @@ DistrictMap_Leaflet.prototype = {
 
     },
 
+    /*  updates legend on attribute change */
     updateLegend: function(max) {
         var grades = [0, 0.2, 0.4, 0.6, 0.8];
         var div = $('.legend')[0];
@@ -143,9 +122,8 @@ DistrictMap_Leaflet.prototype = {
         div.innerHTML += '<br> <i style="background:#000"></i> NA <br>';
     },
 
+    /* returns color based on min/max values */
     getColor: function (data, min, max) {
-        //min = Math.min.apply(Math,data[this.setFieldName].map(function(o){return parseFloat(o[column]);}));
-        //max = Math.max.apply(Math,results3.map(function(o){return parseFloat(o[column]);}));
         var d, perc;
         if (data === undefined) {
             d = -1;
@@ -170,6 +148,7 @@ DistrictMap_Leaflet.prototype = {
                                 '#000'
     },
 
+    /* returns colors for legend */
     getLegendColor: function(perc) {
         return perc >= 0.8  ? '#bd0026' :
             perc >= 0.6  ? '#f03b20' :
@@ -180,6 +159,7 @@ DistrictMap_Leaflet.prototype = {
                                 '#000'
     },
 
+    /* main leaflet map function */
     create_map: function() {
         var self = this;
 
@@ -217,27 +197,7 @@ DistrictMap_Leaflet.prototype = {
             });
         }
 
-
-        function getDensityColor(data) {
-            var d;
-            if (data === undefined) {
-                d = 0;
-            } else {
-                d = data[self.field_name]
-            }
-
-            return d > 1400 ? '#f03b20' :
-
-                d > 1000  ? '#feb24c' :
-                    d > 0  ? '#ffeda0' :
-                        d === 0 ? '#000' :
-                            '#000'
-
-        }
-
-
-
-
+        // parse the csv file, then create geojson layer
         this.parseCSVFile().done(function(result) {
             var min = Math.min.apply(Math,result.map(function(o) { return parseFloat(o[self.field_name])})),
                 max = Math.max.apply(Math,result.map(function(o) { return parseFloat(o[self.field_name])}));
@@ -287,9 +247,6 @@ DistrictMap_Leaflet.prototype = {
                         var csvLayerData = _.find(self.featureData, function(d) {
                             return d[fieldToMatch['csv']] == feature.properties[fieldToMatch['geometry']];
                         })
-                        //if (csvLayerData === undefined) {
-                        //    console.log(feature)
-                        //}
                         return {
                             weight: 2,
                             opacity: self.opacityVal,
@@ -384,20 +341,11 @@ DistrictMap_Leaflet.prototype = {
 
                     }
                 });
-
-                 //inizialize search control
-
-            //        self.map.on('layeradd', function(e) {
-            //
-            //    //console.log(e);
-            //    //self.map.panTo(e.target.getPanes());
-            //    //self.map.fitBounds(e.target.getBounds());
-            //});
-
-                });
+        });
 
     },
 
+    /* parse CSV file when on district change */
     parseCSVFile: function() {
         var self = this;
         var $deferred = new $.Deferred();
@@ -420,6 +368,7 @@ DistrictMap_Leaflet.prototype = {
         return $deferred.promise();
     },
 
+    /* update layers when on attribute change */
     updateStyle: function() {
         var self = this;
         var $deferred = new $.Deferred();
@@ -447,71 +396,17 @@ DistrictMap_Leaflet.prototype = {
 
     },
 
-
-    parseCSV: function(data, dataAttr) {
-        // Split the lines
-        var lines = data.split('\n');
-
-        var joinByIndex = null, // Village.Code
-            dataAttrIndex =null, // Geographical Area
-            joinNameIndex = null;
-        data = []
-        // Iterate over the lines and add categories or series
-        $.each(lines, function(lineNo, line) {
-            var items = line.split(',');
-
-            // header line containes categories
-            if (lineNo == 0) {
-                $.each(items, function (itemNo, item) {
-                    //if (itemNo > 0) options.xAxis.categories.push(item);
-                    if (item === dataAttr) {
-                        dataAttrIndex = itemNo;
-                    }
-                    if (item === fieldToMatch['csv']) {
-                        joinByIndex = itemNo;
-                    }
-                    if (item === 'Village.Name') {
-                        joinNameIndex = itemNo;
-                    }
-
-                });
-            }
-
-            // the rest of the lines contain data with their name in the first
-            // position
-            else {
-                data.push({
-                    "code" : items[joinByIndex],
-                    "name" : items[joinNameIndex],
-                    "value" : Number(items[dataAttrIndex])
-
-
-                })
-            }
-        });
-        return data;
-    },
-
+    /* setter for district name */
     setDistrictName: function(name) {
-        //$(".overlay").show();
-        //$("#loading-img").html('../images/5.gif');
         this.loading(true);
         var self = this;
         this.district_name = name;
-        //this.create_map();
         this.choroLayer.clearLayers();
-        //$.ajax({
-        //    url: 'geometry/' + geojson_file_map[self.district_name] + '.geojson',
-        //    success: function (geojsonObj) {
-        //        self.choroLayer.addTo(self.map);
-        //        self.choroLayer.addData(JSON.parse(geojsonObj))
-        //        self.bestFitZoom();
-        //        self.loading(false);
-        //    }
-        //});
+
         this.create_map();
     },
 
+    /* setter for field name */
     setFieldName: function(name) {
         var self = this;
         $(".info")[0].textContent = "Loading...";
@@ -521,24 +416,10 @@ DistrictMap_Leaflet.prototype = {
             self.loading(false);
             self.info.update();
         });
-
-
-
-        //this.create_map();
     },
 
-    //setMapAttribute: function () {
-    //    var self = this;
-    //    //$.get('data/' + csv_file_map[self.field_name] + '.csv', function(csv) {
-    //        //var parsedData = self.parseCSV(csv, self.field_name);
-    //        //self.mapHandle.series[0].setData(parsedData)
-    //        //self.mapHandle.series[0].name = self.field_name;
-    //    //});
-    //
-    //    self.setFieldName('Outside the State/UT distance');
-    //
-    //},
 
+    /* pan to new district */
     bestFitZoom: function ()
     {
         var self = this;
@@ -548,8 +429,6 @@ DistrictMap_Leaflet.prototype = {
         // map._layers gives all the layers of the map including main container
         // so looping in all those layers filtering those having feature
         $.each(self.choroLayer._layers, function(ml){
-            //self.opacitySlider.setOpacityLayer(this);
-            // here we can be more specific to feature for point, line etc.
             if(this._latlngs)
             {
                 group.addLayer(this)
@@ -557,22 +436,19 @@ DistrictMap_Leaflet.prototype = {
         })
 
         self.map.fitBounds(group.getBounds());
-
-        //var zoom = self.map.getBoundsZoom(latlng.layer.getBounds());
-        //self.map.setView(latlng, zoom); // access the zoom
     },
 
+    /* show loading overlay while waiting for response */
     loading: function(visible) {
         if (visible) {
             $(".overlay").show();
-            //$("#loading-img").html('<img src="./images/5.gif"/>');
         } else {
             $(".overlay").hide();
-            //$("#loading-img").html('');
         }
 
     },
 
+    /* set layer opacity */
     setOpacity: function(val) {
         this.choroLayer.eachLayer(function(layer) {
             layer.setStyle({
@@ -582,9 +458,5 @@ DistrictMap_Leaflet.prototype = {
         });
         this.opacityVal = val;
     }
-
-
-
-
 }
 
