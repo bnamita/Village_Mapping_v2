@@ -37,7 +37,7 @@ Several features are still in the works. If you think you would like to have a g
 Do feel free to suggest additional features as well.<br>
 
 1. Displaying categorical data: As of now the map is only equipped to display numerical data. Attempting to display categorical variables give errors
-2. Changing the chloropeth scheme to a quantile based classification. The current uniform classification does not capture variation well.
+2. Changing the choropleth scheme to a quantile based classification. The current uniform classification does not capture variation well.
 3. A download button to download just the data that is currently being displayed as a csv and the boundaries as a geojson.
 4. A way for users to save images as snapshots
 5. Smaller improvements to the styling and layout of the map.
