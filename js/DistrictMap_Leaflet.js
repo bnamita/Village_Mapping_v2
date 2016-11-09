@@ -110,19 +110,40 @@ DistrictMap_Leaflet.prototype = {
 
     /*  updates legend on attribute change */
     updateLegend: function(max) {
-        var grades = (max <= 10) ? [0, 0.4, 0.8] : [0, 0.2, 0.4, 0.6, 0.8];
+        var grades = [0, 0.4, 0.8];
         var div = $('.legend')[0];
         div.innerHTML = '';
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            if (Math.floor(grades[i]*max) !== Math.floor(grades[i + 1]*max)) {
-                div.innerHTML +=
-                    '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
-                    Math.floor(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + Math.floor(grades[i + 1]*max) + '<br>' : '&ndash;' + Math.floor(max));
-            }
-
+        if (max == -Infinity) {
+            div.innerHTML += '<br> <i style="background:#000"></i> Data NA <br>';
+            return;
         }
-        div.innerHTML += '<br> <i style="background:#000"></i> NA <br>';
+        if (categorical_variables.indexOf(this.field_name) !== -1) {
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                if (Math.floor(grades[i]*max) !== Math.floor(grades[i + 1]*max)) {
+                    div.innerHTML +=
+                        '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
+                        /*Math.floor(grades[i]*max) + */ ((grades[i + 1]*max) ?  Math.floor(grades[i + 1]*max) + '<br>' : Math.floor(max));
+                }
+
+            }
+            div.innerHTML += '<br> <i style="background:#000"></i> Data NA <br>';
+
+        } else {
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                if (Math.floor(grades[i]*max) !== Math.floor(grades[i + 1]*max)) {
+                    div.innerHTML +=
+                        '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
+                        Math.floor(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + Math.floor(grades[i + 1]*max) + '<br>' : '&ndash;' + Math.floor(max));
+                }
+
+            }
+            div.innerHTML += '<br> <i style="background:#000"></i> NA <br>';
+        }
+
+
+
     },
 
     /* returns color based on min/max values */
