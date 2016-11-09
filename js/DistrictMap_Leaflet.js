@@ -110,7 +110,7 @@ DistrictMap_Leaflet.prototype = {
 
     /*  updates legend on attribute change */
     updateLegend: function(max) {
-        var grades = [0, 0.4, 0.8];
+        var grades =  (max <= 10) ? [0, 0.4, 0.8] : [0, 0.2, 0.4, 0.6, 0.8];
         var div = $('.legend')[0];
         div.innerHTML = '';
         if (max == -Infinity) {
