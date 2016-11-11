@@ -66,10 +66,12 @@ DistrictMap_Leaflet.prototype = {
         this.map = L.map('map_container', {
             center: [18.62, 74.2],
             zoom: 9,
-            layers: [MBlight]
+            layers: [MBsatlabel]
         })
 
         var layerControl = L.control.layers(baseLayers, overlays, {collapsed: true}).addTo(this.map); //changed to selectLayers() so that layers panel doesn't get too big.
+        $(layerControl.getContainer()).addClass('baselayer-control');
+
 
         // add the district boundary layer
         var MH_district_boundaries = L.geoJson(null, {
@@ -105,6 +107,7 @@ DistrictMap_Leaflet.prototype = {
         };
 
         this.legend.addTo(this.map);
+        $(this.legend.getContainer()).addClass('legend-control');
 
     },
 
@@ -221,7 +224,10 @@ DistrictMap_Leaflet.prototype = {
         // method that we will use to update the control based on feature properties passed
         self.info.update = function (shapeLayerData, csvLayerData) {
             var csvVillageName;
-
+            if (csvLayerData === null) {
+                this._div.innerHTML = '<h4>' + self.field_name + '  </h4>';
+                return;
+            }
             var dataVal = (csvLayerData && csvLayerData[self.field_name] !== undefined) ? csvLayerData[self.field_name] : 'NA'
             this._div.innerHTML = '<h4>' + self.field_name + '  </h4>' +  (shapeLayerData ?
                 '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData[fieldToMatch['geometry']] + '), ' + shapeLayerData['IPNAME']  +  ': </b><br />' + dataVal : '') ;
@@ -233,6 +239,7 @@ DistrictMap_Leaflet.prototype = {
         };
 
         self.info.addTo(self.map);
+        $(self.info.getContainer()).addClass('info-control');
 
         if (!this.opacitySlider) {
             //Create the opacity controls
@@ -287,7 +294,7 @@ DistrictMap_Leaflet.prototype = {
 
                 function resetHighlight(e, csvLayerData) {
                     self.choroLayer.resetStyle(e.target);
-                    self.info.update(e.target.feature.properties, csvLayerData);
+                    self.info.update(e.target.feature.properties, null);
                 }
 
                 function zoomToFeature(e, csvLayerData) {
@@ -371,7 +378,7 @@ DistrictMap_Leaflet.prototype = {
                         if (self.searchControl === undefined) {
                             self.searchControl = new L.Control.Search({
                                 //container: 'findbox',
-                                textPlaceholder: 'Search Village...',
+                                textPlaceholder: 'Locate Village...',
                                 collapsed: false,
                                 //position: 'topright',
                                 layer: self.choroLayer,
@@ -395,6 +402,7 @@ DistrictMap_Leaflet.prototype = {
                             });
 
                             self.map.addControl( self.searchControl );
+                            $(".leaflet-control-search").attr("data-html2canvas-ignore",true);
                         } else {
                             self.searchControl._input.value = '';
                             self.searchControl._layer = self.choroLayer;
