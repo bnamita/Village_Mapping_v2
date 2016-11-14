@@ -123,10 +123,10 @@ DistrictMap_Leaflet.prototype = {
         if (categorical_variables.indexOf(this.field_name) !== -1) {
             // loop through our density intervals and generate a label with a colored square for each interval
             for (var i = 0; i < grades.length; i++) {
-                if (Math.floor(grades[i]*max) !== Math.floor(grades[i + 1]*max)) {
+                if (Math.round(grades[i]*max) !== Math.round(grades[i + 1]*max)) {
                     div.innerHTML +=
                         '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
-                        /*Math.floor(grades[i]*max) + */ ((grades[i + 1]*max) ?  Math.floor(grades[i + 1]*max) + '<br>' : Math.floor(max));
+                        /*Math.round(grades[i]*max) + */ ((grades[i + 1]*max) ?  Math.round(grades[i + 1]*max) + '<br>' : Math.round(max));
                 }
 
             }
@@ -135,10 +135,10 @@ DistrictMap_Leaflet.prototype = {
         } else {
             // loop through our density intervals and generate a label with a colored square for each interval
             for (var i = 0; i < grades.length; i++) {
-                if (Math.floor(grades[i]*max) !== Math.floor(grades[i + 1]*max)) {
+                if (Math.round(grades[i]*max) !== Math.round(grades[i + 1]*max)) {
                     div.innerHTML +=
                         '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
-                        Math.floor(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + Math.floor(grades[i + 1]*max) + '<br>' : '&ndash;' + Math.floor(max));
+                        this.easynumber(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + this.easynumber(grades[i + 1]*max) + '<br>' : '&ndash;' + this.easynumber(max));
                 }
 
             }
@@ -147,6 +147,17 @@ DistrictMap_Leaflet.prototype = {
 
 
 
+    },
+
+
+    easynumber: function (N) {
+        F = parseFloat(N);
+        if(F == 0)  return "0";
+        else if (!F) return N;
+        else if(F >= 10000000 ) return Math.round(100*F/10000000)/100 + " Cr";
+        else if(F >= 100000 ) return Math.round(100*F/100000)/100 + " L";
+        else if(F >= 1000 ) return Math.round(100*F/1000)/100 + " K";
+        else if(F >= 1) return Math.round(100*F)/100;
     },
 
     /* returns color based on min/max values */
@@ -545,7 +556,7 @@ DistrictMap_Leaflet.prototype = {
         this.choroLayer.eachLayer(function(layer) {
             layer.setStyle({
                 fillOpacity: val,
-                opacity: val
+                //opacity: val
             })
         });
         this.opacityVal = val;
