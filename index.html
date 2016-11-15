@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html >
 <head>
@@ -9,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
     <link rel="stylesheet" href="css/leaflet-search.css">
     <link rel="stylesheet" href="css/Control.Opacity.css" />
-    <title>MH Village Mapping</title>
+    <title>Maharashtra Village Mapping</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/map.css">
 
@@ -31,28 +30,40 @@
         </div>
 
     </div>
+    <div class="header_div">
+        <span class="header"> Village Mapping for Maharashtra</span>
 
+    </div>
     <div>
-        <span class="header"> Village Mapping</span>
-        <span id="area_list" class="list_span">
-            <label for="district-list"> Select district</label>
+
+        <div id="map_container" class="map_container"></div>
+        <div class="box_wrapper">
+            <div id="area_list" >
+                <label for="district-list"> Select district:</label><br>
                 <select id="district-list">
                 </select>
-        </span>
-    </div>
-    <br>
-    <div>
-        <label for="area_list" id="selecr_attr_label">Select Attribute: </label>
+            </div>
+            <div class="list_span">
+                <label id="selecr_attr_label">Select Attribute: </label>
+                <br>
+                <div id="box_container" class="box_container">
 
-    </div>
+                    <select id="box" class="box"></select>
+                </div>
+            </div>
 
-    <div>
-        <div id="box_container" class="box_container">
+            <div class="download_links">
+                <button style="margin-bottom: 5px;" class="btn" id="snapshot">Save as Image</button><br>
+                <a class="btn" id="download_csv" href="data/csvdata/census_split_by_district/522_Ahmadnagar.csv" target="_blank">Download CSV</a>
+                <a class="btn" id="download_geojson" href="geometry/522_Ahmadnagar.geojson" target="_blank">Download boundaries</a>
 
-            <select id="box" class="box"></select>
+
+
+            </div>
         </div>
-        <div id="map_container" class="map_container"></div>
     </div>
+    <div id="img_out"></div>
+    <canvas style="display:none" width="1000" height="600"></canvas>
 
     <!-- JQUERY LIBRARIES -->
     <script src="js/lib/jquery.min.js"   crossorigin="anonymous"></script>
@@ -78,9 +89,16 @@
     <!-- LEAFLET LAYER OPACITY -->
     <script src="js/lib/opacity/Control.Opacity.js"></script>
 
+    <!-- SAVE AS IMAGE -->
+    <script src="js/lib/html2canvas.js"></script>
+    <script src="js/lib/canvas2image.js"></script>
+    <script src="js/lib/opacity/Control.Opacity.js"></script>
+
+
     <!-- APPLICATION SPECIFIC JS -->
     <script src="data/metadata/config.js"></script>
     <script src="js/DistrictMap_Leaflet.js"></script>
+    <script src="js/VillageMapViz.js"></script>
     <script src="js/VillageMapViz.js"></script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

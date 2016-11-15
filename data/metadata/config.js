@@ -429,3 +429,10 @@ var geojson_file_map = {
     "Sangali": "531_Sangali",
     "Palghar": "601_Palghar"
 }
+
+
+var categorical_variables = [
+    "Govt.Secondary.School..Status.A.1..NA.2..",
+    "Govt.Pre.Primary.School..Nursery.LKG.UKG...Status.A.1..NA.2..",
+    "Nearest.Facility.Status..Govt.1..Private.2...3"
+]
