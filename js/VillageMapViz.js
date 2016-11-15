@@ -11,7 +11,8 @@ VillageMapViz.prototype = {
         this.createMap();
 
         // populate attribute list
-        this.createAttrList();
+        //this.createAttrList();
+        this.createGroupedAttrList();
 
         // populate district list
         this.createDistrictList();
@@ -31,6 +32,28 @@ VillageMapViz.prototype = {
             district_name: this.district_name,
             field_name: this.field_name
         });
+    },
+
+    createGroupedAttrList: function() {
+        var self = this,
+            csv_metadata = census_grouped_variables,
+            selectHTML = "";
+
+        for (var key in csv_metadata) {
+            if (csv_metadata.hasOwnProperty(key)) {
+                //console.log(key + " -> " + p[key]);
+                selectHTML+= "<optgroup label='"+ key + "'>";
+                for( var i = 0; i < csv_metadata[key].length; i++) {
+                    selectHTML+= "<option value='"+ csv_metadata[key][i].name + "'>" + csv_metadata[key][i].name + "</option>";
+                }
+                selectHTML += "</optgroup>"
+            }
+            $('#box').html(selectHTML);
+            $('#box').val('Total Population');
+
+            var attrList = $("#box").select2();
+        }
+
     },
 
     createAttrList: function () {

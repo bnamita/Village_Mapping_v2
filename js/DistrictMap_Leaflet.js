@@ -123,10 +123,10 @@ DistrictMap_Leaflet.prototype = {
         if (categorical_variables.indexOf(this.field_name) !== -1) {
             // loop through our density intervals and generate a label with a colored square for each interval
             for (var i = 0; i < grades.length; i++) {
-                if (Math.round(grades[i]*max) !== Math.round(grades[i + 1]*max)) {
+                if (Math.floor(grades[i]*max) !== Math.floor(grades[i + 1]*max)) {
                     div.innerHTML +=
                         '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
-                        /*Math.round(grades[i]*max) + */ ((grades[i + 1]*max) ?  Math.round(grades[i + 1]*max) + '<br>' : Math.round(max));
+                        /*Math.round(grades[i]*max) + */ ((grades[i + 1]*max) ?  Math.floor(grades[i + 1]*max) + '<br>' : Math.floor(max));
                 }
 
             }
@@ -514,7 +514,7 @@ DistrictMap_Leaflet.prototype = {
         var self = this;
         $(".info")[0].textContent = "Loading...";
         this.loading(true);
-        this.field_name = name;
+        this.field_name = fields_short_long_map[name];
         this.updateStyle().done(function(){
             self.loading(false);
             self.info.update();
