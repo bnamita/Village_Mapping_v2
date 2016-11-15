@@ -19,7 +19,10 @@ VillageMapViz.prototype = {
         // attach change events for district and attribute
         this.attachEvents();
 
-
+        // for saving image
+        $(".leaflet-control").attr("data-html2canvas-ignore",true);
+        $(".legend-control")[0].removeAttribute("data-html2canvas-ignore");
+        $(".info-control")[0].removeAttribute("data-html2canvas-ignore");
     },
 
     createMap: function () {
@@ -52,7 +55,7 @@ VillageMapViz.prototype = {
             $('#box').val('Total.Population.of.Village');
 
             var attrList = $("#box").select2();
-            attrList.select2("open");
+            //attrList.select2("open");
 
         });
     },
@@ -74,12 +77,58 @@ VillageMapViz.prototype = {
         $('#district-list').on('change', function(val) {
             self.district_name = $("#district-list").val();
             self.districtMap.setDistrictName(self.district_name);
+            $("#download_csv").attr("href", "data/csvdata/census_split_by_district/" + geojson_file_map[self.district_name] + ".csv");
+            $("#download_geojson").attr("href", "geometry/" + geojson_file_map[self.district_name] + '.geojson');
         });
 
         $("#box").change(function(val) {
             var val = $('#box').val();
             self.districtMap.setFieldName(val);
         });
+
+        $("#snapshot").on("click", function(){
+
+            html2canvas($("#map_container"), {
+                onrendered: function(canvas) {
+                    //var canvas = document.querySelector("canvas"),
+                        context = canvas.getContext("2d");
+                    //context.clearRect(0, 0, canvas.width, canvas.height);
+
+                    var html = d3.select("svg")
+                        .attr("version", 1.1)
+                        .attr("xmlns", "http://www.w3.org/2000/svg")
+                        .node().parentNode.innerHTML;
+
+                    var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+                    //var img = '<img src="'+imgsrc+'">';
+                    //d3.select("#img_out").html(img);
+
+                    theCanvas = canvas;
+                    document.body.appendChild(canvas);
+                    // Convert and download as image
+                    //Canvas2Image.saveAsPNG(canvas);
+
+                    $("#img-out").append(canvas);
+
+
+                    var image = new Image;
+                    image.src = imgsrc;
+                    image.onload = function() {
+                        context.drawImage(image, 0, 0);
+
+                        var a = document.createElement("a");
+                        //a.download = "fallback.png";
+                        a.download = self.district_name + "_" + $("#box").val() + ".png";
+                        a.href = canvas.toDataURL("image/png");
+                        a.click();
+                        // Clean up
+                        context.clearRect(0, 0, canvas.width, canvas.height);
+                        document.body.removeChild(canvas);
+                    };
+                }
+            });
+        });
+
     }
 }
 

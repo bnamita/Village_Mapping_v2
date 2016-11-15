@@ -66,10 +66,12 @@ DistrictMap_Leaflet.prototype = {
         this.map = L.map('map_container', {
             center: [18.62, 74.2],
             zoom: 9,
-            layers: [MBlight]
+            layers: [MBsatlabel]
         })
 
         var layerControl = L.control.layers(baseLayers, overlays, {collapsed: true}).addTo(this.map); //changed to selectLayers() so that layers panel doesn't get too big.
+        $(layerControl.getContainer()).addClass('baselayer-control');
+
 
         // add the district boundary layer
         var MH_district_boundaries = L.geoJson(null, {
@@ -105,21 +107,57 @@ DistrictMap_Leaflet.prototype = {
         };
 
         this.legend.addTo(this.map);
+        $(this.legend.getContainer()).addClass('legend-control');
 
     },
 
     /*  updates legend on attribute change */
     updateLegend: function(max) {
-        var grades = [0, 0.2, 0.4, 0.6, 0.8];
+        var grades =  (max <= 10) ? [0, 0.4, 0.8] : [0, 0.2, 0.4, 0.6, 0.8];
         var div = $('.legend')[0];
         div.innerHTML = '';
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + this.getLegendColor(grades[i]) + '"></i> ' +
-                Math.floor(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + Math.floor(grades[i + 1]*max) + '<br>' : '&ndash;' + Math.floor(max));
+        if (max == -Infinity) {
+            div.innerHTML += '<br> <i style="background:#000"></i> Data NA <br>';
+            return;
         }
-        div.innerHTML += '<br> <i style="background:#000"></i> NA <br>';
+        if (categorical_variables.indexOf(this.field_name) !== -1) {
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                if (Math.round(grades[i]*max) !== Math.round(grades[i + 1]*max)) {
+                    div.innerHTML +=
+                        '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
+                        /*Math.round(grades[i]*max) + */ ((grades[i + 1]*max) ?  Math.round(grades[i + 1]*max) + '<br>' : Math.round(max));
+                }
+
+            }
+            div.innerHTML += '<br> <i style="background:#000"></i> Data NA <br>';
+
+        } else {
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < grades.length; i++) {
+                if (Math.round(grades[i]*max) !== Math.round(grades[i + 1]*max)) {
+                    div.innerHTML +=
+                        '<i style="background:' + this.getLegendColor(grades[i], max) + '"></i> ' +
+                        this.easynumber(grades[i]*max) + ((grades[i + 1]*max) ? '&ndash;' + this.easynumber(grades[i + 1]*max) + '<br>' : '&ndash;' + this.easynumber(max));
+                }
+
+            }
+            div.innerHTML += '<br> <i style="background:#000"></i> NA <br>';
+        }
+
+
+
+    },
+
+
+    easynumber: function (N) {
+        F = parseFloat(N);
+        if(F == 0)  return "0";
+        else if (!F) return N;
+        else if(F >= 10000000 ) return Math.round(100*F/10000000)/100 + " Cr";
+        else if(F >= 100000 ) return Math.round(100*F/100000)/100 + " L";
+        else if(F >= 1000 ) return Math.round(100*F/1000)/100 + " K";
+        else if(F >= 1) return Math.round(100*F)/100;
     },
 
     /* returns color based on min/max values */
@@ -136,7 +174,20 @@ DistrictMap_Leaflet.prototype = {
         } else if (d === 0) {
             perc = 0.2;
         } else {
-            perc = 0.2 + 0.7*(d-min)/(max-min);
+            if ((max - min) > 0) {
+                perc = 0.2 + 0.7*(d-min)/(max-min);
+            } else if ((max - min) === 0) {
+                perc = 1;
+            }
+
+        }
+
+        if (max  <= 10) {
+            return perc > 0.8  ? '#f03b20' :
+                perc > 0.4  ? '#feb24c' :
+                    perc > 0.1  ? '#ffeda0' :
+                                perc === -1 ? '#000' :
+                                    '#000'
         }
 
         return perc > 0.8  ? '#bd0026' :
@@ -149,7 +200,16 @@ DistrictMap_Leaflet.prototype = {
     },
 
     /* returns colors for legend */
-    getLegendColor: function(perc) {
+    getLegendColor: function(perc, max) {
+
+        if (max  <= 10) {
+            return perc >= 0.8  ? '#f03b20' :
+                perc > 0.4  ? '#feb24c' :
+                    perc > 0.1  ? '#ffeda0' :
+                        perc === -1 ? '#000' :
+                            '#000'
+        }
+
         return perc >= 0.8  ? '#bd0026' :
             perc >= 0.6  ? '#f03b20' :
                 perc >= 0.4  ? '#fd8d3c' :
@@ -175,8 +235,11 @@ DistrictMap_Leaflet.prototype = {
         // method that we will use to update the control based on feature properties passed
         self.info.update = function (shapeLayerData, csvLayerData) {
             var csvVillageName;
-
-            var dataVal = (csvLayerData && csvLayerData[self.field_name]) ? csvLayerData[self.field_name] : 'NA'
+            if (csvLayerData === null) {
+                this._div.innerHTML = '<h4>' + self.field_name + '  </h4>';
+                return;
+            }
+            var dataVal = (csvLayerData && csvLayerData[self.field_name] !== undefined) ? csvLayerData[self.field_name] : 'NA'
             this._div.innerHTML = '<h4>' + self.field_name + '  </h4>' +  (shapeLayerData ?
                 '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData[fieldToMatch['geometry']] + '), ' + shapeLayerData['IPNAME']  +  ': </b><br />' + dataVal : '') ;
             if (csvLayerData && (shapeLayerData.VILLNAME !== csvLayerData['Village.Name'])) {
@@ -187,6 +250,7 @@ DistrictMap_Leaflet.prototype = {
         };
 
         self.info.addTo(self.map);
+        $(self.info.getContainer()).addClass('info-control');
 
         if (!this.opacitySlider) {
             //Create the opacity controls
@@ -199,8 +263,20 @@ DistrictMap_Leaflet.prototype = {
 
         // parse the csv file, then create geojson layer
         this.parseCSVFile().done(function(result) {
-            var min = Math.min.apply(Math,result.map(function(o) { return parseFloat(o[self.field_name])})),
-                max = Math.max.apply(Math,result.map(function(o) { return parseFloat(o[self.field_name])}));
+            var min = Math.min.apply(Math,result.map(function(o) {
+                    if (!isNaN(o[self.field_name]) && o[self.field_name] >= 0) {
+                        return parseFloat(o[self.field_name])
+                    }
+                }).filter(function( element ) {
+                    return element !== undefined;
+                })),
+                max = Math.max.apply(Math,result.map(function(o) {
+                    if (!isNaN(o[self.field_name]) && o[self.field_name] >= 0) {
+                        return parseFloat(o[self.field_name])
+                    }
+                }).filter(function( element ) {
+                    return element !== undefined;
+                }));
             self.updateLegend(max);
 
              function getResult() {
@@ -217,7 +293,8 @@ DistrictMap_Leaflet.prototype = {
                         weight: 1,
                         color: '#666',
                         dashArray: '',
-                        fillOpacity: self.opacityVal
+                        fillOpacity: self.opacityVal,
+                        fillColor: self.getColor(csvLayerData, min, max )
                     });
 
                     if (!L.Browser.ie && !L.Browser.opera) {
@@ -228,7 +305,7 @@ DistrictMap_Leaflet.prototype = {
 
                 function resetHighlight(e, csvLayerData) {
                     self.choroLayer.resetStyle(e.target);
-                    self.info.update(e.target.feature.properties, csvLayerData);
+                    self.info.update(e.target.feature.properties, null);
                 }
 
                 function zoomToFeature(e, csvLayerData) {
@@ -241,8 +318,20 @@ DistrictMap_Leaflet.prototype = {
                     style: function (feature) {
                         self.featureData = getResult(),
                          fieldName = getFieldName(),
-                            min = Math.min.apply(Math,self.featureData.map(function(o) { return parseFloat(o[fieldName])})),
-                            max = Math.max.apply(Math,self.featureData.map(function(o) { return parseFloat(o[fieldName])}));
+                            min = Math.min.apply(Math,self.featureData.map(function(o) {
+                                if (!isNaN(o[fieldName]) && o[fieldName] >= 0) {
+                                    return parseFloat(o[fieldName])
+                                }
+                            }).filter(function( element ) {
+                                return element !== undefined;
+                            })),
+                            max = Math.max.apply(Math,self.featureData.map(function(o) {
+                                    if (!isNaN(o[fieldName]) && o[fieldName] >= 0) {
+                                        return parseFloat(o[fieldName])
+                                    }
+                            }).filter(function( element ) {
+                                return element !== undefined;
+                            }));
 
                         var csvLayerData = _.find(self.featureData, function(d) {
                             return d[fieldToMatch['csv']] == feature.properties[fieldToMatch['geometry']];
@@ -300,7 +389,7 @@ DistrictMap_Leaflet.prototype = {
                         if (self.searchControl === undefined) {
                             self.searchControl = new L.Control.Search({
                                 //container: 'findbox',
-                                textPlaceholder: 'Search Village...',
+                                textPlaceholder: 'Locate Village...',
                                 collapsed: false,
                                 //position: 'topright',
                                 layer: self.choroLayer,
@@ -324,6 +413,7 @@ DistrictMap_Leaflet.prototype = {
                             });
 
                             self.map.addControl( self.searchControl );
+                            $(".leaflet-control-search").attr("data-html2canvas-ignore",true);
                         } else {
                             self.searchControl._input.value = '';
                             self.searchControl._layer = self.choroLayer;
@@ -372,10 +462,23 @@ DistrictMap_Leaflet.prototype = {
     updateStyle: function() {
         var self = this;
         var $deferred = new $.Deferred();
+        var min = Math.min.apply(Math,self.featureData.map(function(o) {
+            if (o[self.field_name] !== undefined &&  self.field_name !== undefined && !isNaN(o[self.field_name]) && o[self.field_name] >= 0) {
+                return parseFloat(o[self.field_name])
+            }
+        }).filter(function( element ) {
+            return element !== undefined;
+        })),
+        max = Math.max.apply(Math,self.featureData.map(function(o) {
+            if (o[self.field_name] !== undefined && !isNaN(o[self.field_name]) && o[self.field_name] >= 0) {
+                return parseFloat(o[self.field_name])
+            }
+        }).filter(function( element ) {
+            return element !== undefined;
+        }));
         this.choroLayer.eachLayer(function(layer) {
 
-            var min = Math.min.apply(Math,self.featureData.map(function(o) { return parseFloat(o[self.field_name])})),
-                max = Math.max.apply(Math,self.featureData.map(function(o) { return parseFloat(o[self.field_name])}));
+
             self.updateLegend(max);
 
             var csvLayerData = _.find(self.featureData, function(d) {
@@ -453,7 +556,7 @@ DistrictMap_Leaflet.prototype = {
         this.choroLayer.eachLayer(function(layer) {
             layer.setStyle({
                 fillOpacity: val,
-                opacity: val
+                //opacity: val
             })
         });
         this.opacityVal = val;
