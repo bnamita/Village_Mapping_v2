@@ -67,7 +67,11 @@ label, option {
 /*}*/
 
 .select2-results__options {
-    max-height: 400px !important;
+    /*height: 400px !important;*/
+}
+
+ul.select2-results {
+    max-height: 400px;
 }
 
 #selecr_attr_label {
