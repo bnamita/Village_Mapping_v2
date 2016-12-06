@@ -49,8 +49,8 @@ Do feel free to suggest additional features as well.<br>
 
 8. Non technical help needed<br> 
   *Help us curate the variables and limit to the most relevant ones.[DONE]<br>
-  *Error checking - view variables one at a time and report errors in display
-  *Translation of content to Marathi
+  *Error checking - view variables one at a time and report errors in display<br>
+  *Translation of content to Marathi<br>
   *Help by pulling in Census 2001 data for comparison.<br>
   *Also help by reporting errors and commenting on the data (See tracking sheet here http://tinyurl.com/dmpune17916)<br>
   *Help by spreading the word and share the map with others
