@@ -36,23 +36,33 @@ Contact us at pune@datameet.org
 Several features are still in the works. If you think you would like to have a go at one of these fork us!
 Do feel free to suggest additional features as well.<br>
 
-1. Displaying categorical data: As of now the map is only equipped to display numerical data. Attempting to display categorical variables give errors
+1. Displaying categorical data: As of now the map is only equipped to display numerical data. Attempting to display categorical variables give errors [DONE]
 2. Changing the choropleth scheme to a quantile based classification. The current uniform classification does not capture variation well.
-3. A download button to download just the data that is currently being displayed as a csv and the boundaries as a geojson.
-4. A way for users to save images as snapshots
-5. Smaller improvements to the styling and layout of the map.
+3. A download button to download just the data that is currently being displayed as a csv and the boundaries as a geojson. [DONE]
+4. A way for users to save images as snapshots [DONE]
+5. Smaller improvements to the styling and layout of the map.<br> 
+ * make only the fill transparent, not the border. <br>
+ * display village names after zooming in to a certain level<br>
+ * Need to have further discussion on how the styling/layout can be improved
+6. Link with web map with [Village wiki files](https://github.com/IndiaWikiFiles/Maharashtra)
+7. Incorporate marathi variable names and village names
 
-6. Non technical help needed<br> 
-  *Help us curate the variables and limit to the most relevant ones.<br> 
+8. Non technical help needed<br> 
+  *Help us curate the variables and limit to the most relevant ones.[DONE]<br>
+  *Error checking - view variables one at a time and report errors in display<br>
+  *Translation of content to Marathi<br>
   *Help by pulling in Census 2001 data for comparison.<br>
-  *Also help by reporting errors and commenting on the data (Nikhil can you add the link to your tracking sheet here)<br>
+  *Also help by reporting errors and commenting on the data (See tracking sheet here http://tinyurl.com/dmpune17916)<br>
   *Help by spreading the word and share the map with others
 
 ###Long term planned changes
 1. A way to display a second variable on the same map for comparison
 2. A way for users to add their own data. A two column csv with one column containing the census village codes and the second <br>containing their data of interest.
-3. A way to report errors in the map.
-4. A basic feedback form that sends feedback to our mail id pune@datameet.org
+3. A way to merge town directory data into the webmap
+4. Calculated area variable - To show difference between census geographical area and area of village polygon
+5. Collapsible panel to show a guide to using the map
+6. A way to report errors in the map.
+7. A basic feedback form that sends feedback to our mail id pune@datameet.org
 
 ## Disclaimer
 The data displayed here is data produced by the Census of India. The boundaries of villages are those published on the 
@@ -63,4 +73,5 @@ in the display of the data.
 The code for this map is made available under ____
 
 ## Background of this Exercise
-To be written...
+Read more about how this exercise has evolved at this link
+https://craigdsouza.github.io/village_mapping/
