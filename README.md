@@ -41,7 +41,7 @@ Do feel free to suggest additional features as well.<br>
 3. A download button to download just the data that is currently being displayed as a csv and the boundaries as a geojson. [DONE]
 4. A way for users to save images as snapshots [DONE]
 5. Smaller improvements to the styling and layout of the map.<br> 
- * make only the fill transparent, not the border. [DONE]<br>
+ * make only the fill transparent, not the border.[DONE]<br>
  * display village names after zooming in to a certain level<br>
  * Need to have further discussion on how the styling/layout can be improved
 6. Link with web map with [Village wiki files](https://github.com/IndiaWikiFiles/Maharashtra)
