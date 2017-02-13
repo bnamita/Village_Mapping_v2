@@ -6,7 +6,9 @@ VillageMapViz.prototype = {
         this.district_name = "Ahmadnagar";
         this.field_name = "Total.Population.of.Village";
         this.districtMap = new DistrictMap_Leaflet();
-
+        this.isCustom = false;
+        this.csv = undefined;
+        this.customFieldToMatch = "Village.Code";
         // call to create leaflet map
         this.createMap();
 
@@ -34,79 +36,111 @@ VillageMapViz.prototype = {
         });
     },
 
-    createGroupedAttrList: function() {
+    createGroupedAttrList: function(fields) {
         var self = this,
             csv_metadata = census_grouped_variables,
             selectHTML = "";
 
-        for (var key in csv_metadata) {
-            if (csv_metadata.hasOwnProperty(key)) {
-                //console.log(key + " -> " + p[key]);
-                selectHTML+= "<optgroup label='"+ key + "'>";
-                for( var i = 0; i < csv_metadata[key].length; i++) {
-                    selectHTML+= "<option value='"+ csv_metadata[key][i].name + "'>" + csv_metadata[key][i].name + "</option>";
-                }
-                selectHTML += "</optgroup>"
+        if (self.isCustom && fields !== undefined) {
+            for (var i = 0; i < fields.length; i++) {
+                selectHTML += "<option value='" + fields[i] + "'>" + fields[i] + "</option>";
             }
-            $('#box').html(selectHTML);
-            $('#box').val('Total Population');
+                $('#box').html(selectHTML);
+                $('#box').val(fields[1]);
+                self.districtMap.setFieldName(fields[1]);
+                var attrList = $("#box").select2({
+                    //matcher: modelMatcher
+                }).maximizeSelect2Height({
+                    cushion: 150
+                });
 
-            function modelMatcher (params, data) {
-                data.parentText = data.parentText || "";
-
-                // Always return the object if there is nothing to compare
-                if ($.trim(params.term) === '') {
-                    return data;
+        } else {
+            for (var key in csv_metadata) {
+                if (csv_metadata.hasOwnProperty(key)) {
+                    //console.log(key + " -> " + p[key]);
+                    selectHTML += "<optgroup label='" + key + "'>";
+                    for (var i = 0; i < csv_metadata[key].length; i++) {
+                        selectHTML += "<option value='" + csv_metadata[key][i].name + "'>" + csv_metadata[key][i].name + "</option>";
+                    }
+                    selectHTML += "</optgroup>"
                 }
+                $('#box').html(selectHTML);
+                $('#box').val('Total Population');
 
-                // Do a recursive check for options with children
-                if (data.children && data.children.length > 0) {
-                    // Clone the data object if there are children
-                    // This is required as we modify the object to remove any non-matches
-                    var match = $.extend(true, {}, data);
+                function modelMatcher(params, data) {
+                    data.parentText = data.parentText || "";
 
-                    // Check each child of the option
-                    for (var c = data.children.length - 1; c >= 0; c--) {
-                        var child = data.children[c];
-                        child.parentText += data.parentText + " " + data.text;
+                    // Always return the object if there is nothing to compare
+                    if ($.trim(params.term) === '') {
+                        return data;
+                    }
 
-                        var matches = modelMatcher(params, child);
+                    // Do a recursive check for options with children
+                    if (data.children && data.children.length > 0) {
+                        // Clone the data object if there are children
+                        // This is required as we modify the object to remove any non-matches
+                        var match = $.extend(true, {}, data);
 
-                        // If there wasn't a match, remove the object in the array
-                        if (matches == null) {
-                            match.children.splice(c, 1);
+                        // Check each child of the option
+                        for (var c = data.children.length - 1; c >= 0; c--) {
+                            var child = data.children[c];
+                            child.parentText += data.parentText + " " + data.text;
+
+                            var matches = modelMatcher(params, child);
+
+                            // If there wasn't a match, remove the object in the array
+                            if (matches == null) {
+                                match.children.splice(c, 1);
+                            }
                         }
+
+                        // If any children matched, return the new object
+                        if (match.children.length > 0) {
+                            return match;
+                        }
+
+                        // If there were no matching children, check just the plain object
+                        return modelMatcher(params, match);
                     }
 
-                    // If any children matched, return the new object
-                    if (match.children.length > 0) {
-                        return match;
+                    // If the typed-in term matches the text of this term, or the text from any
+                    // parent term, then it's a match.
+                    var original = (data.parentText + ' ' + data.text).toUpperCase();
+                    var term = params.term.toUpperCase();
+
+
+                    // Check if the text contains the term
+                    if (original.indexOf(term) > -1) {
+                        return data;
                     }
 
-                    // If there were no matching children, check just the plain object
-                    return modelMatcher(params, match);
+                    // If it doesn't contain the term, don't return anything
+                    return null;
                 }
 
-                // If the typed-in term matches the text of this term, or the text from any
-                // parent term, then it's a match.
-                var original = (data.parentText + ' ' + data.text).toUpperCase();
-                var term = params.term.toUpperCase();
-
-
-                // Check if the text contains the term
-                if (original.indexOf(term) > -1) {
-                    return data;
-                }
-
-                // If it doesn't contain the term, don't return anything
-                return null;
+                var attrList = $("#box").select2({
+                    matcher: modelMatcher
+                }).maximizeSelect2Height({
+                    cushion: 150
+                });
             }
 
-            var attrList = $("#box").select2({
-                matcher: modelMatcher
-            }).maximizeSelect2Height({
-                cushion: 150
-            });
+        }
+
+    },
+
+    createFileColList: function(fields) {
+        var self = this,
+            selectHTML = "";
+
+        if (self.isCustom && fields !== undefined) {
+            for (var i = 0; i < fields.length; i++) {
+                selectHTML += "<option value='" + fields[i] + "'>" + fields[i] + "</option>";
+            }
+            $('#col-list').html(selectHTML);
+            $('#col-list').val(fields[1]);
+            self.districtMap.setFieldName(fields[1]);
+            var attrList = $("#col-list").select2();
 
         }
 
@@ -156,12 +190,25 @@ VillageMapViz.prototype = {
         $('#district-list').on('change', function(val) {
             self.district_name = $("#district-list").val();
             self.districtMap.setDistrictName(self.district_name);
-            $("#download_csv").attr("href", "data/csvdata/census_split_by_district/" + geojson_file_map[self.district_name] + ".csv");
-            $("#download_geojson").attr("href", "geometry/" + geojson_file_map[self.district_name] + '.geojson');
+            if (self.isCustom) {
+                //self.districtMap.loadCustomCSV(self.csv.data);
+
+
+            } else {
+
+                $("#download_csv").attr("href", "data/csvdata/census_split_by_district/" + geojson_file_map[self.district_name] + ".csv");
+                $("#download_geojson").attr("href", "geometry/" + geojson_file_map[self.district_name] + '.geojson');
+            }
+
+        });
+
+        $("#col-list").on('change', function(val) {
+            self.districtMap.setFieldToMatch($("#col-list").val());
         });
 
         $("#box").change(function(val) {
             var val = $('#box').val();
+            self.field_name = val;
             self.districtMap.setFieldName(val);
         });
 
@@ -208,6 +255,71 @@ VillageMapViz.prototype = {
             });
         });
 
+        var file_input = document.getElementById('file_input');
+        if(file_input.addEventListener) {
+
+            file_input.addEventListener('change', function(e) {
+                self.filename = document.getElementById("uploadFile").value = e.target.files[0].name;
+                self.handleFile(e, self);
+            });
+        }
+
+
+        $("input[name='data-input']").change(function(e){
+            if($(this).val() == 'custom') {
+                $("#custom-div").css({display:'block'});
+                self.isCustom = true;
+                self.districtMap.isCustom = true;
+                if (self.csv !== undefined) {
+                    self.districtMap.setFieldName(self.csv.meta.fields[1]);
+                    self.districtMap.setFieldToMatch($("#col-list").val());
+                }
+                $("#download_csv").prop("disabled", true);
+                //self.district_name = $("#district-list-custom").val();
+                //$("#district-list").val(self.district_name).trigger('change');
+                //self.districtMap.setDistrictName(self.district_name);
+
+
+            } else {
+                self.isCustom = false;
+                self.districtMap.isCustom = false;
+                self.createGroupedAttrList();
+                self.districtMap.setFieldName('Total Population');
+                self.districtMap.setFieldToMatch(fieldToMatch.csv);
+                $("#custom-div").css({display:'none'});
+                $("#download_csv").prop("disabled", false);
+                //self.districtMap.create_map();
+            }
+
+        });
+        //$('#myModal').on('hidden.bs.modal', function () {
+        //
+        //});
+    },
+
+    handleFile: function (e, self) {
+        var file = e.target.files[0];
+        if (file.type !== "text/csv") {
+            alert("File type not supported. Please upload a csv file");
+            return;
+        }
+        Papa.parse(file, {
+            header: true,
+            dynamicTyping: true,
+            complete: function(results) {
+                self.csv = results;
+                self.districtMap.setCustomData(results.data);
+                self.createFileColList(self.csv.meta.fields);
+                self.createGroupedAttrList(self.csv.meta.fields);
+                self.districtMap.setFieldName(self.csv.meta.fields[1]);
+
+            }
+        });
+
     }
+
+
+
+
 }
 

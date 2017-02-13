@@ -14,8 +14,11 @@ DistrictMap_Leaflet.prototype = {
             this.setup_map();
         }
         this.loading(true);
+        this.isCustom = args.isCustom || false;
         this.create_map();
-        this.searchControl;
+        this.searchControl,
+        this.fieldToMatch = args.isCustom ? this.customFieldToMatch : fieldToMatch.csv;
+
     },
 
 
@@ -241,8 +244,11 @@ DistrictMap_Leaflet.prototype = {
             }
             var dataVal = (csvLayerData && csvLayerData[self.field_name] !== undefined) ? csvLayerData[self.field_name] : 'NA'
             this._div.innerHTML = '<h4>' + self.field_name + '  </h4>' +  (shapeLayerData ?
-                '<b>' + shapeLayerData.VILLNAME + ' (' + shapeLayerData[fieldToMatch['geometry']] + '), ' + shapeLayerData['IPNAME']  +  ': </b><br />' + dataVal : '') ;
-            if (csvLayerData && (shapeLayerData.VILLNAME !== csvLayerData['Village.Name'])) {
+                '<span class="info-value"><b>' + shapeLayerData.VILLNAME + ': ' + dataVal + '</b></span>' +
+                    '<br/> (Taluka: ' + shapeLayerData['IPNAME']  +
+                '<br /> Village Code: ' + shapeLayerData[fieldToMatch['geometry']] + ')<br/>' : '') ;
+
+            if (csvLayerData && csvLayerData['Village.Name'] && (shapeLayerData.VILLNAME !== csvLayerData['Village.Name'])) {
                 this._div.innerHTML += '<br>' + ' Village name in csv: ' + csvLayerData['Village.Name'];
 
             }
@@ -334,7 +340,7 @@ DistrictMap_Leaflet.prototype = {
                             }));
 
                         var csvLayerData = _.find(self.featureData, function(d) {
-                            return d[fieldToMatch['csv']] == feature.properties[fieldToMatch['geometry']];
+                            return d[self.fieldToMatch] == feature.properties[fieldToMatch['geometry']];
                         })
                         return {
                             weight: 2,
@@ -355,7 +361,7 @@ DistrictMap_Leaflet.prototype = {
                         //});
                         var featureData = getResult();
                         var csvLayerData = _.find(featureData, function(d) {
-                            return d[fieldToMatch['csv']] == feature.properties[fieldToMatch['geometry']];
+                            return d[self.fieldToMatch] == feature.properties[fieldToMatch['geometry']];
                         })
                         layer.on({
                             mouseover: function(e) {
@@ -438,7 +444,11 @@ DistrictMap_Leaflet.prototype = {
     /* parse CSV file when on district change */
     parseCSVFile: function() {
         var self = this;
+        self.loading(true);
         var $deferred = new $.Deferred();
+        if (self.isCustom === true && self.csv !== undefined) {
+            $deferred.resolve(self.csv);
+        }
         var filepath = 'data/csvdata/census_split_by_district/' + geojson_file_map[self.district_name] +  '.csv';
         Papa.parse(filepath, {
             download: true,
@@ -482,7 +492,7 @@ DistrictMap_Leaflet.prototype = {
             self.updateLegend(max);
 
             var csvLayerData = _.find(self.featureData, function(d) {
-                return d[fieldToMatch['csv']] == layer.feature.properties[fieldToMatch['geometry']];
+                return d[self.fieldToMatch] == layer.feature.properties[fieldToMatch['geometry']];
             })
 
             layer.setStyle({
@@ -505,7 +515,6 @@ DistrictMap_Leaflet.prototype = {
         var self = this;
         this.district_name = name;
         this.choroLayer.clearLayers();
-
         this.create_map();
     },
 
@@ -513,12 +522,24 @@ DistrictMap_Leaflet.prototype = {
     setFieldName: function(name) {
         var self = this;
         $(".info")[0].textContent = "Loading...";
-        this.loading(true);
-        this.field_name = fields_short_long_map[name];
+        //this.loading(true);
+        this.field_name = (self.isCustom === true) ? name : fields_short_long_map[name];
         this.updateStyle().done(function(){
-            self.loading(false);
+            //self.loading(false);
             self.info.update();
         });
+    },
+
+    /* setter for field name */
+    setFieldToMatch: function(name) {
+        this.fieldToMatch = name;
+        this.create_map();
+
+    },
+
+    setCustomData: function(data) {
+        this.csv = data;
+        this.create_map();
     },
 
 
