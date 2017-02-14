@@ -51,7 +51,6 @@ label, option {
     height: 600px;
 }
 
-
 .box_container {
     width: 22%;
 }
@@ -149,4 +148,39 @@ body{
 
 .right-input {
     margin-left: 15px !important;
+}
+
+#help_overlay {
+    position: fixed;
+    top: 40px;
+    left: 20px;
+    width: 96%;
+    height: 95%;
+    background-color: #000;
+    filter:alpha(opacity=50);
+    -moz-opacity:0.5;
+    -khtml-opacity: 0.5;
+    opacity: 1;
+    z-index: 10000;
+    display: block;
+    background: url('../css/images/help.png') no-repeat right top;
+    background-size: 100% 100%;
+
+}
+
+.help {
+    text-decoration: underline;
+    float: right;
+    color: #337ab7;
+    margin-right: 30px;
+    cursor: pointer;
+}
+
+.viz-container {
+    height: 600px;
+}
+
+.license {
+    padding-top: 10px;
+    text-align: center;
 }

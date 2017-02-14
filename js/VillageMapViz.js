@@ -26,6 +26,8 @@ VillageMapViz.prototype = {
         $(".leaflet-control").attr("data-html2canvas-ignore",true);
         $(".legend-control")[0].removeAttribute("data-html2canvas-ignore");
         $(".info-control")[0].removeAttribute("data-html2canvas-ignore");
+
+        this.addHelp();
     },
 
     createMap: function () {
@@ -316,8 +318,27 @@ VillageMapViz.prototype = {
             }
         });
 
-    }
+    },
 
+    addHelp: function() {
+        $("#help").on('click', function () {
+            if($(this).text() == 'Help') {
+                $(this).text('Close help');
+                $('body').append('<div id="help_overlay"> </div>')
+            }
+            else {
+                $(this).text('Help');
+                $('#help_overlay').remove();
+            }
+
+            $(document).keyup(function(e) {
+                if (e.keyCode == 27) { // escape key maps to keycode `27`
+                    $("#help").text('Help');
+                    $('#help_overlay').remove();
+                }
+            });
+        });
+    }
 
 
 
