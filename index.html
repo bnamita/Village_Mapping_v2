@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="css/leaflet-search.css">
     <link rel="stylesheet" href="css/Control.Opacity.css" />
     <title>Maharashtra Village Mapping</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/map.css">
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/map.css">
+    <link rel="stylesheet" href="css/style.css">
 
     <script>
         function init() {
@@ -31,20 +32,43 @@
 
     </div>
     <div class="header_div">
-        <span class="header"> Village Mapping for Maharashtra</span>
+        <span class="header"> Mapping village census data (by district) for Maharashtra</span>
+        <span id="help" class="help">Help</span>
 
     </div>
-    <div>
-
-        <div id="map_container" class="map_container"></div>
+    <div class="viz-container">
         <div class="box_wrapper">
+
+            <!-- Radio buttons to choose Census/Custom-->
+            <label> Select data source:</label><br>
+            <input type="radio" name="data-input" value="census" checked> Census
+            <input type="radio" name="data-input" class="right-input" value="custom"> Upload CSV <span style="font-size: 11px; color:gray">(< 3MB)</span><br>
+            <!-- if custom, unhide below -->
+
+            <!--<label for="uploadFile"> Upload your own data (in CSV format)</label><br>-->
+            <div id="custom-div" class="custom-div">
+                <input id="uploadFile" placeholder="Upload csv file" disabled="disabled" />
+                <div class="fileUpload btn btn-primary">
+                    <span>Browse</span>
+                    <input id="file_input" type="file" class="upload" />
+                </div>
+
+                <div id="file_col_list" >
+                    <label for="col-list"> Select Village Code column:</label><br>
+                    <select id="col-list">
+                    </select>
+                </div>
+            </div>
+
+            <!-- end unhide -->
+
             <div id="area_list" >
                 <label for="district-list"> Select district:</label><br>
                 <select id="district-list">
                 </select>
             </div>
             <div class="list_span">
-                <label id="selecr_attr_label">Select Attribute: </label>
+                <label id="selecr_attr_label">Select attribute: </label>
                 <br>
                 <div id="box_container" class="box_container">
 
@@ -52,22 +76,38 @@
                 </div>
             </div>
 
+
+            <!--<button type="button" class="uploadBtn btn btn-primary" data-toggle="modal" data-target="#myModal">Upload external data</button>-->
             <div class="download_links">
-                <button style="margin-bottom: 5px;" class="btn" id="snapshot">Save as Image</button><br>
-                <a class="btn" id="download_csv" href="data/csvdata/census_split_by_district/522_Ahmadnagar.csv" target="_blank">Download CSV</a>
-                <a class="btn" id="download_geojson" href="geometry/522_Ahmadnagar.geojson" target="_blank">Download boundaries</a>
+                <button style="margin-bottom: 5px;" class="btn btn-primary" id="snapshot">Save as Image</button><br>
+                <a class="btn btn-primary" id="download_csv" href="data/csvdata/census_split_by_district/522_Ahmadnagar.csv" target="_blank">Download CSV</a>
+                <a class="btn btn-primary" id="download_geojson" href="geometry/522_Ahmadnagar.geojson" target="_blank">Download boundaries</a>
 
 
 
             </div>
         </div>
+        <div id="map_container" class="map_container"></div>
+    </div>
+    <div class="license">
+        <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+            <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" />
+        </a>
+        <br />
+        This work is licensed under a
+        <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+            Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
+        </a>.
     </div>
     <div id="img_out"></div>
     <canvas style="display:none" width="1000" height="600"></canvas>
 
+
     <!-- JQUERY LIBRARIES -->
     <script src="js/lib/jquery.min.js"   crossorigin="anonymous"></script>
     <script src="js/lib/jquery-ui-1.10.3.custom.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- LEAFLET -->
     <script src="js/lib/leaflet-src.js"></script>
@@ -96,8 +136,13 @@
     <script src="js/lib/opacity/Control.Opacity.js"></script>
 
 
+    <!-- SAVE AS IMAGE -->
+    <script src="js/lib/xlsToCSV/jszip.js"></script>
+    <script src="js/lib/xlsToCSV/xlsx.js"></script>
+
     <!-- APPLICATION SPECIFIC JS -->
     <script src="data/metadata/config.js"></script>
+    <script src="js/excelToCSV.js"></script>
     <script src="js/DistrictMap_Leaflet.js"></script>
     <script src="js/VillageMapViz.js"></script>
     <script src="js/VillageMapViz.js"></script>
