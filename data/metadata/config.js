@@ -18,7 +18,7 @@ var geojson_file_map = {
     "Wardha": "504_Wardha",
     "Nagpur": "505_Nagpur",
     "Bhandara": "506_Bhandara",
-    "Gondia": "507_Gondia",
+    "Gondiya": "507_Gondia",
     "Gadchiroli": "508_Gadchiroli",
     "Chandrapur": "509_Chandrapur",
     "Yavatmal": "510_Yavatmal",
@@ -27,12 +27,12 @@ var geojson_file_map = {
     "Parbhani": "513_Parbhani",
     "Jalna": "514_Jalna",
     "Aurangabad": "515_Aurangabad",
-    "Nasik": "516_Nasik",
+    "Nashik": "516_Nasik",
     "Thane": "517_Thane",
     "Raigad": "520_Raigad",
     "Pune": "521_Pune",
     "Ahmadnagar": "522_Ahmadnagar",
-    "Beed": "523_Beed",
+    "Bid": "523_Beed",
     "Latur": "524_Latur",
     "Osmanabad": "525_Osmanabad",
     "Solapur": "526_Solapur",
@@ -40,7 +40,7 @@ var geojson_file_map = {
     "Ratnagiri": "528_Ratnagiri",
     "Sindhudurg": "529_Sindhudurg",
     "Kolhapur": "530_Kolhapur",
-    "Sangali": "531_Sangali",
+    "Sangli": "531_Sangali",
     "Palghar": "601_Palghar"
 }
 
