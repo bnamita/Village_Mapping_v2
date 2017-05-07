@@ -141,6 +141,7 @@ VillageMapViz.prototype = {
             }
             $('#col-list').html(selectHTML);
             $('#col-list').val(fields[1]);
+            self.districtMap.setFieldToMatch(fields[1]);
             self.districtMap.setFieldName(fields[1]);
             var attrList = $("#col-list").select2();
 
@@ -273,6 +274,7 @@ VillageMapViz.prototype = {
                 self.isCustom = true;
                 self.districtMap.isCustom = true;
                 if (self.csv !== undefined) {
+                    self.createGroupedAttrList(self.csv.meta.fields);
                     self.districtMap.setFieldName(self.csv.meta.fields[1]);
                     self.districtMap.setFieldToMatch($("#col-list").val());
                 }
