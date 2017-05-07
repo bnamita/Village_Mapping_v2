@@ -70,7 +70,7 @@ DistrictMap_Leaflet.prototype = {
             center: [18.62, 74.2],
             zoom: 9,
             layers: [MBsatlabel]
-        })
+        });
 
         var layerControl = L.control.layers(baseLayers, overlays, {collapsed: true}).addTo(this.map); //changed to selectLayers() so that layers panel doesn't get too big.
         $(layerControl.getContainer()).addClass('baselayer-control');
@@ -269,6 +269,8 @@ DistrictMap_Leaflet.prototype = {
 
         // parse the csv file, then create geojson layer
         this.parseCSVFile().done(function(result) {
+            self.setVillageLabellVisibility();
+
             var min = Math.min.apply(Math,result.map(function(o) {
                     if (!isNaN(o[self.field_name]) && o[self.field_name] >= 0) {
                         return parseFloat(o[self.field_name])
@@ -359,6 +361,13 @@ DistrictMap_Leaflet.prototype = {
                         //layer.on('mouseout', function (e) {
                         //    this.closePopup();
                         //});
+                        var label = L.marker(layer.getBounds().getCenter(), {
+                            icon: L.divIcon({
+                                className: 'polygon_label',
+                                html: feature.properties.VILLNAME,
+                                iconSize: [100, 40]
+                            })
+                        }).addTo(self.map);
                         var featureData = getResult();
                         var csvLayerData = _.find(featureData, function(d) {
                             return d[self.fieldToMatch] == feature.properties[fieldToMatch['geometry']];
@@ -385,12 +394,21 @@ DistrictMap_Leaflet.prototype = {
                 $.ajax({
                     url: 'geometry/' + geojson_file_map[self.district_name] + '.geojson',
                     success: function (geojsonObj) {
+                        var visible = true;
                         self.choroLayer.addTo(self.map);
+
                         if (typeof geojsonObj === "string") {
                             geojsonObj = JSON.parse(geojsonObj);
                         }
                         self.choroLayer.addData(geojsonObj);
                         self.bestFitZoom();
+
+                        self.setVillageLabellVisibility();
+
+                        // Attach map zoom handler
+                        self.map.on('zoomend', function (e) {
+                            self.setVillageLabellVisibility();
+                        });
 
                         if (self.searchControl === undefined) {
                             self.searchControl = new L.Control.Search({
@@ -438,7 +456,6 @@ DistrictMap_Leaflet.prototype = {
                     }
                 });
         });
-
     },
 
     /* parse CSV file when on district change */
@@ -581,6 +598,15 @@ DistrictMap_Leaflet.prototype = {
             })
         });
         this.opacityVal = val;
+    },
+
+    setVillageLabellVisibility: function() {
+        // Check zoom level
+        if (this.map.getZoom() > 11) {
+            $('.polygon_label').css('visibility','visible')
+        } else {
+            $('.polygon_label').css('visibility','hidden')
+        }
     }
 }
 
